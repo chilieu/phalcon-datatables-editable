@@ -1,0 +1,133 @@
+<?php use Phalcon\Tag; ?>
+
+<?php echo $this->getContent(); ?>
+
+<h1>Motherboard</h1>
+
+<table width="100%">
+    <tr>
+        <td align="center">
+            <?php echo $this->tag->linkTo(array("", "Home", 'class' => 'btn btn-success')); ?>
+            <?php echo $this->tag->linkTo(array("motherboard/new", "Create", 'class' => 'btn btn-success fancybox fancybox.iframe')); ?>
+        </td>
+    </tr>
+</table>
+
+<?php $this->flashSession->output();?>
+
+<table align="center" class="table table-striped table-bordered hover dataTable" id="motherboard-list">
+    <thead>
+        <tr>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th width="20px">Components</th>
+            <th width="20px">Delete</th>
+         </tr>
+    </thead>
+
+    <tfoot>
+        <tr>
+            <th>Manufacturer</th>
+            <th>Model</th>
+            <th>Components</th>
+            <th><div class="add_delete_toolbar" /></th>
+         </tr>
+    </tfoot>
+
+    <tbody>
+    <?php foreach ($page->items as $motherboard) { ?>
+        <tr id="<?php echo $motherboard->id ?>" class="ui-state-default">
+            <td><?php echo $motherboard->manufacturer ?></td>
+            <td><?php echo $motherboard->model ?></td>
+            <td><?php echo $this->tag->linkTo(array("motherboard/components/" . $motherboard->id, "Components", "class" => "btn btn-success fancybox fancybox.iframe")); ?></td>
+            <td><?php echo $this->tag->linkTo(array("motherboard/delete/" . $motherboard->id, "Delete", "class" => "btn btn-danger delete")); ?></td>
+        </tr>
+    <?php } ?>
+    </tbody>
+    
+</table>
+
+<script>
+
+$(document).ready(function() {
+
+    //Rows Reordering
+    //function keeping the width of TR 
+    var fixHelperModified = function(e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function(index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+        };
+
+    var updateIndex = function(e, ui) {
+            $('td.index', ui.item.parent()).each(function (i) {
+                $(this).html(i + 1);
+            });
+    };
+
+    var updateSort = function (e, ui){
+        var order = $("#motherboard-list tbody").sortable("serialize");
+
+        $.ajax({
+            url: '/compatibility/motherboard/ajaxorder',
+            type: 'POST',
+            dataType: 'html',
+            data: order,
+            beforeSend: function(){},
+            error: function(xhr, textStatus, errorThrown) {},
+            success: function(data, textStatus, xhr) {
+                alert(data);
+            }
+        });
+
+    };
+
+    $("#motherboard-list tbody").sortable({
+            axis: 'y',
+            helper: fixHelperModified,
+            stop: updateIndex,
+            update: updateSort
+    }).disableSelection();
+
+
+    //editable datatables
+    $('#motherboard-list').dataTable({
+            "bSort" : false,
+            aoColumns: [ {"sName": "manufacturer"}, {"sName": "model"}, {"sName": "components"}, {"sName": "id"}]
+
+        }).makeEditable({
+
+            sUpdateURL: "/compatibility/motherboard/ajaxsave",
+            "aoColumns": [
+                            {
+                                onblur: 'submit',
+                                indicator: 'Saving Manufacturer ...'
+                            },
+                            {
+                                onblur: 'submit',
+                                indicator: 'Saving Model ...'
+                            },
+                            null,
+                            null
+                        ]
+
+        });
+
+    $('.delete').click(function(e){
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var answer = confirm ("Are you sure you want to delete from the database?");
+        if (answer)
+        {
+            // Do it!
+            window.location = url;
+        }
+    });
+
+
+});
+
+</script>

@@ -1,0 +1,31 @@
+.btn-success.active, .btn-success.focus, .btn-success:active, .btn-success:focus, .btn-success:hover, .open>.dropdown-toggle.btn-success {
+    background-color: #2E672E;
+}
+
+.btn-warning.active, .btn-warning.focus, .btn-warning:active, .btn-warning:focus, .btn-warning:hover, .open>.dropdown-toggle.btn-warning {
+	background-color: #BD7B1F;
+}
+
+.btn-default.active, .btn-default.focus, .btn-default:active, .btn-default:focus, .btn-default:hover, .open>.dropdown-toggle.btn-default {
+	background-color: #C3C3C3;	
+}
+
+.btn-default.danger, .btn-danger.focus, .btn-danger:active, .btn-danger:focus, .btn-danger:hover, .open>.dropdown-toggle.btn-danger {
+	background-color: #AB302A;	
+}
+
+.btn-success.inactive {
+    opacity: 0.5;
+}
+
+.btn-warning.inactive {
+	opacity: 0.5;
+}
+
+.btn-default.inactive {
+	opacity: 0.5;
+}
+
+.btn-danger.inactive {
+	opacity: 0.5;
+}

@@ -1,0 +1,90 @@
+
+<?php echo $this->getContent(); ?>
+
+<?php $this->flashSession->output();?>
+
+<h1><?php echo $cmp->manufacturer;?> <?php echo $cmp->model;?></h1>
+
+<form action="<?php echo $this->url->get("compatibility/save") ?>" method="POST">
+
+<input type="hidden" name="components_id" value="<?php echo $cmp->id;?>">
+
+<table class="table table-hover" id="components-list">
+
+	<thead>
+
+		<tr>
+
+			<th>OS</th>
+
+			<th>Compatibility</th>
+
+			<th>Note</th>
+
+		</tr>
+
+	</thead>
+
+	<tbody>
+
+<?php $c=0;?>
+
+<?php foreach($os as $item):?>
+
+	<tr id="row-<?php echo $item->id;?>">
+
+		<td><label class="col-md-6 control-label"><?php echo $item->name ." ". $item->revision;?></label></td>
+		
+		<td>
+				<div class="btn-group" data-toggle="buttons-<?php echo $item->id;?>" id="btn-group-<?php echo $item->id;?>">
+
+			   			<input name="compatible[<?php echo $item->id;?>][compatible]" type='hidden' value="<?php echo $compatibility[$item->id]['compatible'];?>"/>
+
+						<button type="button" class="btn btn-success <?php echo ($compatibility[$item->id]['compatible'] == 1 && ($compatibility[$item->id]['compatible'] !== "")) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="1" >Yes</button>
+
+						<button type="button" class="btn btn-danger <?php echo ($compatibility[$item->id]['compatible'] == -1 && ($compatibility[$item->id]['compatible'] !== "")) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="-1" >No</button>
+
+						<button type="button" class="btn btn-default <?php echo ($compatibility[$item->id]['compatible'] == 0 && ($compatibility[$item->id]['compatible'] !== "")) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="0" >Maybe</button>
+
+				</div>
+
+		</td>
+
+		<td><input type="text" class="form-control" placeholder="Note" name="compatible[<?php echo $item->id;?>][note]" value="<?php echo $compatibility[$item->id]['note'];?>"></td>
+
+	</tr>
+
+<?php endforeach;?>
+
+	<tbody>
+
+</table>
+
+	<div class="row">
+
+		<div class="col-xs-12" align="center"><input type="submit" value="Save" name="save" class="btn btn-primary" /></div>
+
+	</div>
+
+</form>
+
+<script type="text/javascript">
+
+	$('#components-list').dataTable();
+
+	$('#components-list').on ( "click",'.btn[data-radio-name]', function() {
+
+	    $('.btn[data-radio-name="'+$(this).data('radioName')+'"]').removeClass('active').addClass('inactive');
+
+		$(this).removeClass('inactive');
+	    $(this).addClass('active');
+
+	    $('input[name="'+$(this).data('radioName')+'"]').val(
+
+	        $(this).attr("val")
+
+	    );
+
+	});
+
+</script>
