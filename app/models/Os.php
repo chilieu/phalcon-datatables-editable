@@ -28,6 +28,18 @@ class Os extends \Phalcon\Mvc\Model
     public $release_year;
 
 
+    public function initialize()
+    {
+        $this->hasMany("id", "Os", "os_id");
+        $this->hasManyToMany(
+            "id",
+            "Compatibility",
+            "os_id", "components_id",
+            "Components",
+            "id"
+        );
+    }
+
     public function getId()    {
         return $this->id;
     }

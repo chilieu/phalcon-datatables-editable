@@ -59,7 +59,7 @@ class ComponentsController extends ControllerBase
         if (!is_array($parameters)) {
             $parameters = array();
         }
-        $parameters["order"] = "id";
+        $parameters["order"] = "id DESC";
 
         $components = Components::find($parameters);
         if (count($components) == 0) {
@@ -71,13 +71,7 @@ class ComponentsController extends ControllerBase
             ));
         }
 
-        $paginator = new Paginator(array(
-            "data" => $components,
-            "limit"=> 10,
-            "page" => $numberPage
-        ));
-
-        $this->view->page = $paginator->getPaginate();
+        $this->view->page = $components;
     }
 
     /**
@@ -85,8 +79,8 @@ class ComponentsController extends ControllerBase
      */
     public function newAction()
     {
-        //disable layout rendering
-        //$this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
+        //set layout to no nav layout
+        $this->view->setLayout('nonavlayout');
     }
 
     /**
@@ -121,11 +115,12 @@ class ComponentsController extends ControllerBase
         }
 
         $this->flashSession->success("component was created successfully");
-
+        
         return $this->dispatcher->forward(array(
             "controller" => "components",
-            "action" => "index"
+            "action" => "new"
         ));
+        
 
     }
 
@@ -158,6 +153,21 @@ class ComponentsController extends ControllerBase
                 "action" => "search"
             ));
         }
+
+        //delete in MotherboardComponents and Compatibility
+        $MotherboardComponents = MotherboardComponents::find(array(
+            "conditions" => "components_id = ?1",
+            "bind"       => array(1 => $id)
+        ));
+        $MotherboardComponents->delete();
+
+        //delete in MotherboardComponents and Compatibility
+        $compatibility = Compatibility::find(array(
+            "conditions" => "components_id = ?1",
+            "bind"       => array(1 => $id)
+        ));
+        $compatibility->delete();
+
 
         $this->flashSession->success("component was deleted successfully");
         return $this->response->redirect("components/search");

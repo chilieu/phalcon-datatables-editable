@@ -21,6 +21,12 @@ class MotherboardComponents extends \Phalcon\Mvc\Model
      */
     public $components_id;
 
+    public function initialize()
+    {
+        $this->belongsTo("motherboard_id", "motherboard", "id");
+        $this->belongsTo("components_id", "components", "id");
+    }
+
     public function getSource()
     {
         return 'motherboard_components';

@@ -1,0 +1,55 @@
+<?php echo $this->getContent(); ?>
+<div align="left">
+
+<table class="table table-striped table-bordered table-hover motherboard-compatibility">
+	<thead>
+		<tr>
+			<th><h2><?php echo $motherboard->manufacturer?> <?php echo $motherboard->model?></h2></th>
+			<?php foreach($motherboard->Components as $components):?>
+				<th><?php echo $components->type?><br><?php echo $components->model?></th>
+			<?php endforeach;?>
+			<th>
+				<a href="<?php echo $this->url->get("motherboard/componentsAdd/" . $motherboard->id); ?>" class="btn btn-success fancybox fancybox.iframe"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+			</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		
+		<?php foreach($os as $key => $val):?>
+
+		<tr>
+			<td><strong><?php echo $val['name'] . " " . $val['revision']; ?></strong></td>
+			<?php foreach($val['compatibility'] as $compatible => $item):?>
+					<td>
+						<?php if($item['compatible'] == 1):?>
+							<button class="btn btn-transparent green-color"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+						<?php elseif($item['compatible'] == -1):?>
+							<button class="btn btn-transparent orange-color"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+						<?php else:?>
+							<button class="btn btn-transparent black-color"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></button>
+						<?php endif;?>
+						<!--<?php echo $item['components_id'];?> - <?php echo $item['os_id'];?>-->
+						<?php if( !empty($item['note']) ):?>
+							<a style="cursor:pointer;" data-toggle="popover" title="<?php echo $item['note']; ?>"><span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span> Note</a>
+						<?php endif;?>
+					</td>
+			<?php endforeach;?>
+			<td></td>
+		</tr>
+
+		<?php endforeach;?>
+
+		<tr>
+			<td><a href="<?php echo $this->url->get("os/new"); ?>" class="btn btn-success fancybox fancybox.iframe"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></td>
+			<?php foreach($motherboard->Components as $components):?>
+				<td></td>
+			<?php endforeach;?>
+			<td></td>
+		</tr>
+
+	</tbody>
+
+</table>
+
+</div>

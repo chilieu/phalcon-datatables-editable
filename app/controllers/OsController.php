@@ -71,7 +71,7 @@ class OsController extends ControllerBase
             ));
         }
 
-        $this->view->page = Os::find();
+        $this->view->page = $os;
 
     }
 
@@ -80,8 +80,8 @@ class OsController extends ControllerBase
      */
     public function newAction()
     {
-        //disable layout rendering
-        //$this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
+        //set layout to no nav layout
+        $this->view->setLayout('nonavlayout');
     }
 
     /**
@@ -115,12 +115,12 @@ class OsController extends ControllerBase
             ));
         }
 
-        $this->flash->success("OS was created successfully");
-
+        $this->flashSession->success("OS was created successfully");
         return $this->dispatcher->forward(array(
             "controller" => "os",
-            "action" => "index"
+            "action" => "new"
         ));
+        
 
     }
 

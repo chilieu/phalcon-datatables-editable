@@ -27,4 +27,19 @@ class Motherboard extends \Phalcon\Mvc\Model
      */
     public $order;
 
+
+    public function initialize()
+    {
+        $this->hasMany("id", "MotherboardComponents", "motherboard_id");
+
+        $this->hasManyToMany(
+            "id",
+            "MotherboardComponents",
+            "motherboard_id", "components_id",
+            "Components",
+            "id"
+        );
+
+    }
+
 }

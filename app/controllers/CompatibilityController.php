@@ -26,8 +26,9 @@ class CompatibilityController extends ControllerBase
      */
     public function setupAction()
     {
-    	//disable layout rendering
-		//$this->view->setRenderLevel(\Phalcon\Mvc\View::LEVEL_ACTION_VIEW);
+        //set layout to no nav layout
+        $this->view->setLayout('nonavlayout');
+
 		$comp_os_connection = array();
     	$components_id = $this->request->getQuery("components_id", "int");
     	$cmp = Components::findFirst("id=" . $components_id);
@@ -95,5 +96,102 @@ class CompatibilityController extends ControllerBase
         return $this->response->redirect("compatibility/setup?components_id=" . $parameters['components_id']);
 
     }
+
+    public function ajaxSaveAction()
+    {
+        //disable view in Ajax processing
+        $this->view->disable();
+    	$parameters = $this->request->getPost();
+
+		// Query compatibility binding parameters with string placeholders
+		$conditions = "components_id = :components_id: AND os_id = :os_id:";
+
+		//Parameters whose keys are the same as placeholders
+		$param = array(
+		    "components_id" => $parameters['components_id'],
+		    "os_id" => $parameters['os_id']
+		);
+
+		$cmp = Compatibility::findFirst(array(
+			$conditions,
+			"bind" => $param
+		));
+
+		if( !$cmp ){//if doesn't exists => save it
+			$save = new Compatibility();
+			$save->components_id = $parameters['components_id'];
+			$save->os_id = $parameters['os_id'];
+			$save->compatible = $parameters['compatible'];
+			$save->save();
+		} else {//update record
+			$cmp->compatible = $parameters['compatible'];
+			$cmp->save();
+		}
+
+	}
+
+    public function ajaxSaveNoteAction()
+    {
+        //disable view in Ajax processing
+        $this->view->disable();
+    	$parameters = $this->request->getPost();
+
+		// Query compatibility binding parameters with string placeholders
+		$conditions = "components_id = :components_id: AND os_id = :os_id:";
+
+		//Parameters whose keys are the same as placeholders
+		$param = array(
+		    "components_id" => $parameters['components_id'],
+		    "os_id" => $parameters['os_id']
+		);
+
+		$cmp = Compatibility::findFirst(array(
+			$conditions,
+			"bind" => $param
+		));
+
+		if( !$cmp ){//if doesn't exists => save it
+			$save = new Compatibility();
+			$save->components_id = $parameters['components_id'];
+			$save->os_id = $parameters['os_id'];
+			$save->note = $parameters['note'];
+			$save->save();
+		} else {//update record
+			$cmp->note = $parameters['note'];
+			$cmp->save();
+		}
+
+	}
+
+
+	public function ajaxDeleteAction(){
+        //disable view in Ajax processing
+        $this->view->disable();
+		$parameters = $this->request->getPost();        
+
+		// Query compatibility binding parameters with string placeholders
+		$conditions = "components_id = :components_id: AND os_id = :os_id:";
+
+		//Parameters whose keys are the same as placeholders
+		$param = array(
+		    "components_id" => $parameters['components_id'],
+		    "os_id" => $parameters['os_id']
+		);
+
+		$cmp = Compatibility::findFirst(array(
+			$conditions,
+			"bind" => $param
+		));
+
+		if( !$cmp->delete() ){
+            foreach ($component->getMessages() as $message) {
+                $this->flashSession->error($message);
+            }
+		} else {
+        	$this->flashSession->success("compatibility was deleted successfully");
+		}
+
+        return;
+	}
 
 }

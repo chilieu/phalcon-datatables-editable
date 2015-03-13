@@ -5,11 +5,13 @@
 
 <h1><?php echo $cmp->manufacturer;?> <?php echo $cmp->model;?></h1>
 
-<form action="<?php echo $this->url->get("compatibility/save") ?>" method="POST">
+<table class="table table-striped table-bordered table-hover" id="components-list">
 
-<input type="hidden" name="components_id" value="<?php echo $cmp->id;?>">
-
-<table class="table table-hover" id="components-list">
+        <colgroup>
+            <col class="col-md-6">
+            <col class="col-md-3">
+            <col class="col-md-3">
+        </colgroup>
 
 	<thead>
 
@@ -37,20 +39,18 @@
 		
 		<td>
 				<div class="btn-group" data-toggle="buttons-<?php echo $item->id;?>" id="btn-group-<?php echo $item->id;?>">
-
 			   			<input name="compatible[<?php echo $item->id;?>][compatible]" type='hidden' value="<?php echo $compatibility[$item->id]['compatible'];?>"/>
-
-						<button type="button" class="btn btn-success <?php echo ($compatibility[$item->id]['compatible'] == 1 && ($compatibility[$item->id]['compatible'] !== "")) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="1" >Yes</button>
-
-						<button type="button" class="btn btn-danger <?php echo ($compatibility[$item->id]['compatible'] == -1 && ($compatibility[$item->id]['compatible'] !== "")) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="-1" >No</button>
-
-						<button type="button" class="btn btn-default <?php echo ($compatibility[$item->id]['compatible'] == 0 && ($compatibility[$item->id]['compatible'] !== "")) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="0" >Maybe</button>
-
+						<button type="button" class="btn btn-success <?php echo ($compatibility[$item->id]['compatible'] == 1 && !empty($compatibility[$item->id]['compatible'])) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="1" attr-id="<?php echo $item->id;?>" ><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+						<button type="button" class="btn btn-danger <?php echo ($compatibility[$item->id]['compatible'] == -1 && !empty($compatibility[$item->id]['compatible'])) ? "active" : "inactive";?>" data-radio-name="compatible[<?php echo $item->id;?>][compatible]" val="-1" attr-id="<?php echo $item->id;?>" ><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+						<button type="button" class="btn btn-transparent gray-color delete" attr-id="<?php echo $item->id;?>"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
 				</div>
 
 		</td>
 
-		<td><input type="text" class="form-control" placeholder="Note" name="compatible[<?php echo $item->id;?>][note]" value="<?php echo $compatibility[$item->id]['note'];?>"></td>
+		<td>
+			<input type="text" class="form-control" placeholder="Note" name="compatible[<?php echo $item->id;?>][note]" value="<?php echo $compatibility[$item->id]['note'];?>">
+			<button type="button" class="btn btn-primary save" attr-id="<?php echo $item->id;?>"><span class="glyphicon glyphicon-floppy-saved" aria-hidden="true"></span></button>
+		</td>
 
 	</tr>
 
@@ -60,17 +60,11 @@
 
 </table>
 
-	<div class="row">
-
-		<div class="col-xs-12" align="center"><input type="submit" value="Save" name="save" class="btn btn-primary" /></div>
-
-	</div>
-
-</form>
-
 <script type="text/javascript">
 
-	$('#components-list').dataTable();
+$(document).ready(function() {
+
+	$('#components-list').dataTable({"iDisplayLength": 10});
 
 	$('#components-list').on ( "click",'.btn[data-radio-name]', function() {
 
@@ -85,6 +79,72 @@
 
 	    );
 
+	    /*Ajax update here*/
+	    var components_id = <?php echo $cmp->id;?>;
+	    var compatible = $(this).attr("val");
+	    var os_id = $(this).attr("attr-id");
+        $.ajax({
+            url: '<?php echo $this->url->get("compatibility/ajaxSave") ?>',
+            type: 'POST',
+            dataType: 'html',
+            data: {'components_id': components_id,'os_id': os_id,'compatible': compatible},
+            beforeSend: function(){},
+            error: function(xhr, textStatus, errorThrown) {},
+            success: function(data, textStatus, xhr) {
+                if(data !== "") alert(data);
+            }
+        });
+
 	});
+
+
+    $('#components-list').on("click",'.delete',  function(e) {
+
+        e.preventDefault();
+        var answer = confirm ("Are you sure you want to delete from the database?");
+        if (answer)
+        {
+            // Do it!
+		    /*Ajax update here*/
+		    var components_id = <?php echo $cmp->id;?>;
+		    var os_id = $(this).attr("attr-id");
+	        $.ajax({
+	            url: '<?php echo $this->url->get("compatibility/ajaxDelete") ?>',
+	            type: 'POST',
+	            dataType: 'html',
+	            data: {'components_id': components_id,'os_id': os_id},
+	            beforeSend: function(){},
+	            error: function(xhr, textStatus, errorThrown) {},
+	            success: function(data, textStatus, xhr) {
+	                if(data !== "") alert(data);
+	                window.location.reload(true);
+	            }
+	        });
+        }
+    });
+
+    $('#components-list').on('click', '.save', function(e) {
+        e.preventDefault();
+	    /*Ajax update here*/
+	    var components_id = <?php echo $cmp->id;?>;
+	    var os_id = $(this).attr("attr-id");
+	    var note = $(this).siblings("input").val();
+        $.ajax({
+            url: '<?php echo $this->url->get("compatibility/ajaxSaveNote") ?>',
+            type: 'POST',
+            dataType: 'html',
+            data: {'components_id': components_id,'os_id': os_id, 'note': note},
+            beforeSend: function(){},
+            error: function(xhr, textStatus, errorThrown) {},
+            success: function(data, textStatus, xhr) {
+                if(data !== "") alert(data);
+                window.location.reload(true);
+            }
+        });
+
+    });
+
+
+});
 
 </script>
